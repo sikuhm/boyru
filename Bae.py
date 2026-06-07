@@ -3,13 +3,14 @@ import random
 import pygame
 from typing import Tuple, Optional, List
 
+from Choi_animals import CHOI_IMAGE_CACHE
 from animal import Animal, Predator, Prey, Egg, TILE_SIZE
 
 
 # ════════════════════════════════════════════════
 #  Anaconda
 # ════════════════════════════════════════════════
-
+Bae = {}
 class Anaconda(Predator):
     """
     아나콘다 클래스.
@@ -57,6 +58,35 @@ class Anaconda(Predator):
             max_accelerate=water_max_accelerate,
             **kwargs,
         )
+
+        # 💡 1. 여기서 코뿔소 전용 이미지를 설정
+        self.image_path = "anaconda.png"  # 아나콘다 이미지 파일명
+        self.image = None
+        
+        # 이미지가 캐시에 없으면 최초 1회 로드
+        if self.image_path not in Bae:
+            try:
+                loaded_img = pygame.image.load(self.image_path).convert_alpha()
+                Bae[self.image_path] = loaded_img
+            except Exception as e:
+                print(f"⚠️ {name} 이미지 로드 실패: {e}")
+                # 💡 [핵심] 실패하더라도 딕셔너리에 None을 넣어줘야함
+                Bae[self.image_path] = None
+        orig_img = Bae[self.image_path]
+        orig_w, orig_h = orig_img.get_size() # 원본 이미지의 가로, 세로 픽셀
+            
+        # 동물의 크기(size)를 기준으로 최대 렌더링 크기 설정
+        target_max_size = int(self.size * 2.5)
+            
+        # 가로와 세로 중 더 긴 쪽을 기준으로 축소/확대 비율(scale_factor)을 계산
+        scale_factor = target_max_size / max(orig_w, orig_h)
+            
+        # 구한 비율을 가로, 세로에 똑같이 곱해주어 비율 유지
+        new_w = int(orig_w * scale_factor)
+        new_h = int(orig_h * scale_factor)
+            
+        # 새로운 가로, 세로 크기로 스케일링
+        self.image = pygame.transform.scale(orig_img, (new_w, new_h))
 
         # ── 아나콘다 전용 속성 ──
         self.choke_range: float = choke_range
