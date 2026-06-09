@@ -8,7 +8,7 @@ from gui import HUD
 from physics import PhysicsEngine
 from Lee_animals import Parrot, Capybara, Monkey #내가 추가
 from Choi_animals import Rhino, ElectricEel, ToxicFrog #내가 추가
-from Bae import Anaconda
+from Bae import Anaconda, Crocodile, Tarantula #내가 추가
 
 SCREEN_WIDTH  = 1280
 SCREEN_HEIGHT = 720
@@ -57,6 +57,17 @@ def main():
         px = tx * TILE_SIZE + TILE_SIZE / 2   # 타일 → 픽셀(중심) 변환
         py = ty * TILE_SIZE + TILE_SIZE / 2
         animals.append(Anaconda(name=f"아나콘다_{i+1}", coordinate=(px, py)))
+        
+    # 악어 — 아나콘다처럼 물에서 스폰
+    for i in range(4):
+        if not water_tiles:
+            break
+        tx, ty = random.choice(water_tiles)
+        px = tx * TILE_SIZE + TILE_SIZE / 2
+        py = ty * TILE_SIZE + TILE_SIZE / 2
+        croc_sex = "male" if i % 2 == 0 else "female"
+        animals.append(Crocodile(name=f"악어_{i+1}", coordinate=(px, py),
+                             age=600, sex=croc_sex))
     # 전기뱀장어는 물 타일 근처에 스폰하는 것이 자연스럽습니다.
     animals.append(ElectricEel(name="전기뱀장어A", coordinate=(1000.0, 1000.0)))
     animals.append(ElectricEel(name="전기뱀장어B", coordinate=(1080.0,1000.0),sex='female'))
@@ -66,6 +77,24 @@ def main():
 
     animals.append(Rhino(name="대장코뿔소", coordinate=(400.0, 500.0), age=600, sex="male"))
     animals.append(ToxicFrog(name="화살독개구리", coordinate=(350.0, 450.0), age=600, sex="female"))
+    # 육지 타일 수집 (한 번만)
+    land_tiles = [
+        (tx, ty)
+        for ty in range(game_map.map_height)
+        for tx in range(game_map.map_width)
+        if not game_map.is_water(tx, ty)
+    ]
+
+    # 타란튤라 — 육지에서 스폰
+    for i in range(4):
+        if not land_tiles:
+            break
+        tx, ty = random.choice(land_tiles)
+        px = tx * TILE_SIZE + TILE_SIZE / 2
+        py = ty * TILE_SIZE + TILE_SIZE / 2
+        tarantula_sex = "male" if i % 2 == 0 else "female"
+        animals.append(Tarantula(name=f"타란튤라_{i+1}", coordinate=(px, py),
+                             age=600, sex=tarantula_sex))
 
     # ... (중략) ...
 
